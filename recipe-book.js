@@ -117,9 +117,7 @@ function renderRecipes() {
     
     recipesContainer.innerHTML = filteredRecipes.map((recipe, index) => `
         <div class="recipe-card-compact" onclick="openRecipeModal(${recipes.indexOf(recipe)})">
-            ${recipe.thumbnailUrl ? `
-                <img src="${recipe.thumbnailUrl}" alt="${recipe.title}" class="recipe-card-thumbnail">
-            ` : ''}
+            
             
             <div class="recipe-card-body">
                 <h3 class="recipe-card-title">${recipe.title || 'Untitled Recipe'}</h3>
