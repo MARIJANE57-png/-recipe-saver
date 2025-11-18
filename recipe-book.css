@@ -564,4 +564,6 @@ body {
   background: rgba(255, 255, 255, 0.3);
 }
 SimplyCodes
-
+git add recipe-book.js
+git commit -m "Remove thumbnail images"
+git push origin main

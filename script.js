@@ -1,6 +1,6 @@
 // FoodBook - Recipe Import JavaScript
 
-const API_URL = 'https://recipe-api-pqbr.onrender.com/api';
+const API_URL = 'https://recipe-api-pqbr.onrender.com';
 
 // Tab Switching for Horizontal Pills
 const tabPills = document.querySelectorAll('.tab-pill');

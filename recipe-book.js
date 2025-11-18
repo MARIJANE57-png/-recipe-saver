@@ -1,314 +1,213 @@
-// Recipe Book JavaScript - Clean Version (No Emojis)
+// Recipe Book JavaScript - ShopMy Style Horizontal Cards
 
-let recipes = [];
+let allRecipes = [];
 let filteredRecipes = [];
-let currentView = 'grid';
 
-// DOM Elements
-const recipesContainer = document.getElementById('recipesContainer');
-const emptyState = document.getElementById('emptyState');
-const searchInput = document.getElementById('searchInput');
-const sourceFilter = document.getElementById('sourceFilter');
-const sortFilter = document.getElementById('sortFilter');
-const clearFiltersBtn = document.getElementById('clearFilters');
-const hamburgerMenu = document.getElementById('hamburgerMenu');
-const filterDropdown = document.getElementById('filterDropdown');
-const totalCount = document.getElementById('totalCount');
-const tiktokCount = document.getElementById('tiktokCount');
-const instagramCount = document.getElementById('instagramCount');
-const favoriteCount = document.getElementById('favoriteCount');
-const modal = document.getElementById('recipeModal');
-const modalBody = document.getElementById('modalBody');
-const modalClose = document.querySelector('.modal-close');
-
-// Event Listeners
-searchInput.addEventListener('input', applyFilters);
-sourceFilter.addEventListener('change', applyFilters);
-sortFilter.addEventListener('change', applyFilters);
-clearFiltersBtn.addEventListener('click', clearFilters);
-
-// Hamburger Menu Toggle
-hamburgerMenu.addEventListener('click', (e) => {
-    e.stopPropagation();
-    filterDropdown.classList.toggle('hidden');
+// Load recipes on page load
+document.addEventListener('DOMContentLoaded', () => {
+    loadRecipes();
+    setupSearch();
+    setupFilters();
 });
 
-// Close dropdown when clicking outside
-document.addEventListener('click', (e) => {
-    if (!filterDropdown.contains(e.target) && e.target !== hamburgerMenu) {
-        filterDropdown.classList.add('hidden');
-    }
-});
-
-modalClose.addEventListener('click', closeModal);
-modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
-
-// Initialize
-loadRecipes();
-updateStats();
-applyFilters();
-
-// Functions
 function loadRecipes() {
-    try {
-        const saved = localStorage.getItem('recipes');
-        if (saved) {
-            recipes = JSON.parse(saved);
-        }
-    } catch (error) {
-        console.error('Failed to load recipes:', error);
-        recipes = [];
-    }
+    const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
+    allRecipes = recipes;
+    filteredRecipes = recipes;
+    displayRecipes(recipes);
+    updateRecipeCount(recipes.length);
 }
 
-function updateStats() {
-    totalCount.textContent = recipes.length;
-    tiktokCount.textContent = recipes.filter(r => r.source !== 'Instagram').length;
-    instagramCount.textContent = recipes.filter(r => r.source === 'Instagram').length;
-    favoriteCount.textContent = recipes.filter(r => r.favorite).length;
-}
-
-function applyFilters() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const selectedSource = sourceFilter.value;
-    const selectedSort = sortFilter.value;
+function displayRecipes(recipes) {
+    const container = document.getElementById('recipeGrid');
     
-    // Filter recipes
-    filteredRecipes = recipes.filter(recipe => {
-        const matchesSearch = !searchTerm || 
-            recipe.title?.toLowerCase().includes(searchTerm) ||
-            recipe.description?.toLowerCase().includes(searchTerm) ||
-            recipe.ingredients?.some(ing => ing.toLowerCase().includes(searchTerm));
-        
-        const matchesSource = selectedSource === 'all' || 
-            (selectedSource === 'TikTok' && recipe.source !== 'Instagram') ||
-            recipe.source === selectedSource;
-        
-        return matchesSearch && matchesSource;
-    });
-    
-    // Sort recipes
-    filteredRecipes.sort((a, b) => {
-        switch (selectedSort) {
-            case 'newest':
-                return new Date(b.createdAt) - new Date(a.createdAt);
-            case 'oldest':
-                return new Date(a.createdAt) - new Date(b.createdAt);
-            case 'name-asc':
-                return (a.title || '').localeCompare(b.title || '');
-            case 'name-desc':
-                return (b.title || '').localeCompare(a.title || '');
-            default:
-                return 0;
-        }
-    });
-    
-    renderRecipes();
-}
-
-function renderRecipes() {
-    if (filteredRecipes.length === 0) {
-        recipesContainer.innerHTML = '';
-        emptyState.classList.remove('hidden');
+    if (recipes.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px; color: var(--color-warm-gray);">
+                <p style="font-size: 18px; margin-bottom: 12px;">No recipes yet!</p>
+                <p style="font-size: 14px;">Import your first recipe to get started</p>
+            </div>
+        `;
         return;
     }
     
-    emptyState.classList.add('hidden');
-    
-    recipesContainer.innerHTML = filteredRecipes.map((recipe, index) => `
-        <div class="recipe-card-compact" onclick="openRecipeModal(${recipes.indexOf(recipe)})">
-            
-            
-            <div class="recipe-card-body">
+    container.innerHTML = recipes.map(recipe => `
+        <div class="recipe-card-horizontal" onclick="openRecipeModal(${recipes.indexOf(recipe)})">
+            ${recipe.thumbnailUrl ? `
+                <div class="recipe-card-image">
+                    <img src="${recipe.thumbnailUrl}" alt="${recipe.title}">
+                </div>
+            ` : `
+                <div class="recipe-card-image recipe-card-no-image">
+                    <span style="font-size: 48px;">🍽️</span>
+                </div>
+            `}
+            <div class="recipe-card-content">
                 <h3 class="recipe-card-title">${recipe.title || 'Untitled Recipe'}</h3>
                 
-                ${recipe.prepTime || recipe.cookTime || recipe.servings ? `
-                    <div class="recipe-card-meta">
-                        ${recipe.prepTime ? `
-                            <span class="recipe-card-meta-item">${recipe.prepTime}</span>
-                        ` : ''}
-                        ${recipe.cookTime ? `
-                            <span class="recipe-card-meta-item">${recipe.cookTime}</span>
-                        ` : ''}
-                        ${recipe.servings ? `
-                            <span class="recipe-card-meta-item">${recipe.servings} servings</span>
-                        ` : ''}
-                    </div>
+                ${recipe.description ? `
+                    <p class="recipe-card-description">${recipe.description.substring(0, 100)}${recipe.description.length > 100 ? '...' : ''}</p>
                 ` : ''}
                 
-                ${recipe.description ? `
-                    <p class="recipe-card-description">${recipe.description}</p>
-                ` : ''}
+                <div class="recipe-card-meta">
+                    ${recipe.prepTime ? `<span>⏱️ ${recipe.prepTime}</span>` : ''}
+                    ${recipe.servings ? `<span>🍽️ ${recipe.servings} servings</span>` : ''}
+                </div>
                 
                 <div class="recipe-card-footer">
-                    <div class="recipe-source-tag">
-                        ${recipe.source || 'TikTok'}
-                    </div>
-                    
-                    <div class="recipe-actions" onclick="event.stopPropagation()">
-                        <button class="action-btn favorite ${recipe.favorite ? 'active' : ''}" 
-                                onclick="toggleFavorite(${recipes.indexOf(recipe)})">
-                            ${recipe.favorite ? 'â¤ï¸' : 'ðŸ¤'}
-                        </button>
-                    </div>
+                    <span class="recipe-source-badge">${recipe.source || 'Recipe'}</span>
+                    <button class="favorite-btn ${recipe.favorite ? 'active' : ''}" onclick="toggleFavorite(event, ${recipes.indexOf(recipe)})">
+                        ${recipe.favorite ? '❤️' : '🤍'}
+                    </button>
                 </div>
             </div>
         </div>
     `).join('');
 }
 
-function openRecipeModal(index) {
-    const recipe = recipes[index];
+function updateRecipeCount(count) {
+    const countEl = document.getElementById('recipeCount');
+    if (countEl) {
+        countEl.textContent = `${count} recipe${count !== 1 ? 's' : ''} saved`;
+    }
+}
+
+function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            filteredRecipes = allRecipes.filter(recipe => {
+                return (recipe.title?.toLowerCase().includes(query)) ||
+                       (recipe.ingredients?.some(ing => ing.toLowerCase().includes(query))) ||
+                       (recipe.tags?.some(tag => tag.toLowerCase().includes(query)));
+            });
+            displayRecipes(filteredRecipes);
+            updateRecipeCount(filteredRecipes.length);
+        });
+    }
+}
+
+function setupFilters() {
+    const filterBtn = document.getElementById('filterBtn');
+    const filterMenu = document.getElementById('filterMenu');
     
-    modalBody.innerHTML = `
-        <div class="recipe-detail">
+    if (filterBtn && filterMenu) {
+        filterBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            filterMenu.classList.toggle('show');
+        });
+        
+        document.addEventListener('click', () => {
+            filterMenu.classList.remove('show');
+        });
+        
+        filterMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+}
+
+function filterBySource(source) {
+    if (source === 'all') {
+        filteredRecipes = allRecipes;
+    } else {
+        filteredRecipes = allRecipes.filter(recipe => recipe.source === source);
+    }
+    displayRecipes(filteredRecipes);
+    updateRecipeCount(filteredRecipes.length);
+    document.getElementById('filterMenu').classList.remove('show');
+}
+
+function filterByFavorites() {
+    filteredRecipes = allRecipes.filter(recipe => recipe.favorite);
+    displayRecipes(filteredRecipes);
+    updateRecipeCount(filteredRecipes.length);
+    document.getElementById('filterMenu').classList.remove('show');
+}
+
+function toggleFavorite(event, index) {
+    event.stopPropagation();
+    allRecipes[index].favorite = !allRecipes[index].favorite;
+    localStorage.setItem('recipes', JSON.stringify(allRecipes));
+    displayRecipes(filteredRecipes);
+}
+
+function openRecipeModal(index) {
+    const recipe = filteredRecipes[index];
+    const modal = document.getElementById('recipeModal');
+    const modalContent = document.getElementById('modalRecipeContent');
+    
+    modalContent.innerHTML = `
+        <div class="modal-recipe-header">
+            ${recipe.thumbnailUrl ? `
+                <img src="${recipe.thumbnailUrl}" alt="${recipe.title}" class="modal-recipe-image">
+            ` : ''}
+            <h2 class="modal-recipe-title">${recipe.title}</h2>
+            ${recipe.description ? `<p class="modal-recipe-description">${recipe.description}</p>` : ''}
             
-            
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
-                <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: #0a0a0a; line-height: 1.2; letter-spacing: -1px;">${recipe.title || 'Untitled Recipe'}</h2>
-                <button class="action-btn favorite ${recipe.favorite ? 'active' : ''}" 
-                        onclick="toggleFavorite(${index}); openRecipeModal(${index})"
-                        style="font-size: 24px; padding: 10px 14px;">
-                    ${recipe.favorite ? 'â¤ï¸' : 'ðŸ¤'}
-                </button>
+            <div class="modal-recipe-meta">
+                ${recipe.prepTime ? `<span>⏱️ Prep: ${recipe.prepTime}</span>` : ''}
+                ${recipe.cookTime ? `<span>🔥 Cook: ${recipe.cookTime}</span>` : ''}
+                ${recipe.servings ? `<span>🍽️ Servings: ${recipe.servings}</span>` : ''}
             </div>
             
-            ${recipe.source ? `
-                <div style="margin-bottom: 16px;">
-                    <span style="background: rgba(0,0,0,0.05); color: #0a0a0a; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                        ${recipe.source}
-                    </span>
-                </div>
-            ` : ''}
+            <span class="recipe-source-badge">${recipe.source || 'Recipe'}</span>
+        </div>
+        
+        <div class="modal-recipe-body">
+            <div class="modal-section">
+                <h3>Ingredients</h3>
+                <ul class="ingredients-list">
+                    ${recipe.ingredients?.map(ing => `<li>${ing}</li>`).join('') || '<li>No ingredients listed</li>'}
+                </ul>
+            </div>
             
-            ${recipe.prepTime || recipe.cookTime || recipe.servings || recipe.difficulty ? `
-                <div style="display: flex; gap: 24px; margin-bottom: 28px; flex-wrap: wrap;">
-                    ${recipe.prepTime ? `
-                        <div>
-                            <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Prep Time</div>
-                            <div style="font-weight: 600; font-size: 16px;">${recipe.prepTime}</div>
-                        </div>
-                    ` : ''}
-                    ${recipe.cookTime ? `
-                        <div>
-                            <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Cook Time</div>
-                            <div style="font-weight: 600; font-size: 16px;">${recipe.cookTime}</div>
-                        </div>
-                    ` : ''}
-                    ${recipe.servings ? `
-                        <div>
-                            <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Servings</div>
-                            <div style="font-weight: 600; font-size: 16px;">${recipe.servings}</div>
-                        </div>
-                    ` : ''}
-                    ${recipe.difficulty ? `
-                        <div>
-                            <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Difficulty</div>
-                            <div style="font-weight: 600; font-size: 16px;">${recipe.difficulty}</div>
-                        </div>
-                    ` : ''}
-                </div>
-            ` : ''}
-            
-            ${recipe.description ? `
-                <p style="color: #666; line-height: 1.7; margin-bottom: 32px; font-size: 15px;">${recipe.description}</p>
-            ` : ''}
-            
-            ${recipe.ingredients && recipe.ingredients.length > 0 ? `
-                <div style="margin-bottom: 36px;">
-                    <h3 style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; margin-bottom: 20px; color: #0a0a0a;">Ingredients</h3>
-                    <ul style="list-style: none; padding: 0; margin: 0;">
-                        ${recipe.ingredients.map(ing => {
-                            if (!ing || typeof ing !== 'string' || ing.trim() === '') return '';
-                            return `<li style="padding: 14px 18px; background: #e8eef7; margin-bottom: 10px; border-radius: 10px; border-left: 4px solid #8b9d83; font-size: 15px; line-height: 1.6; color: #333;">
-                                ${ing.trim()}
-                            </li>`;
-                        }).join('')}
-                    </ul>
-                </div>
-            ` : ''}
-            
-            ${recipe.instructions && recipe.instructions.length > 0 ? `
-                <div style="margin-bottom: 36px;">
-                    <h3 style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; margin-bottom: 20px; color: #0a0a0a;">Instructions</h3>
-                    <ol style="padding-left: 0; counter-reset: step; margin: 0;">
-                        ${recipe.instructions.map((step, idx) => {
-                            if (!step || typeof step !== 'string' || step.trim() === '') return '';
-                            return `<li style="padding: 18px; padding-left: 70px; background: #e8eef7; margin-bottom: 12px; border-radius: 10px; list-style: none; position: relative; counter-increment: step; font-size: 15px; line-height: 1.7; color: #333;">
-                                <div style="position: absolute; left: 18px; top: 18px; width: 36px; height: 36px; background: #8b9d83; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px;">
-                                    ${idx + 1}
-                                </div>
-                                ${step.trim()}
-                            </li>`;
-                        }).join('')}
-                    </ol>
-                </div>
-            ` : ''}
+            <div class="modal-section">
+                <h3>Instructions</h3>
+                <ol class="instructions-list">
+                    ${recipe.instructions?.map(step => `<li>${step}</li>`).join('') || '<li>No instructions provided</li>'}
+                </ol>
+            </div>
             
             ${recipe.notes ? `
-                <div style="background: #fff9e6; padding: 20px; border-radius: 12px; border-left: 4px solid #ffd700; margin-bottom: 24px;">
-                    <h3 style="font-size: 18px; margin-bottom: 8px; color: #333; font-weight: 600;">Notes</h3>
-                    <p style="color: #666; line-height: 1.6; margin: 0;">${recipe.notes}</p>
-                </div>
-            ` : ''}
-            
-            ${recipe.tags && recipe.tags.length > 0 ? `
-                <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;">
-                    ${recipe.tags.map(tag => `
-                        <span style="background: #8b9d83; color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">
-                            ${tag}
-                        </span>
-                    `).join('')}
-                </div>
-            ` : ''}
-            
-            ${recipe.sourceUrl ? `
-                <div style="padding-top: 24px; border-top: 2px solid #f0f0f0;">
-                    <a href="${recipe.sourceUrl}" target="_blank" 
-                       style="color: #8b9d83; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
-                        View Original Post â†’
-                    </a>
+                <div class="modal-section">
+                    <h3>Notes</h3>
+                    <p>${recipe.notes}</p>
                 </div>
             ` : ''}
         </div>
+        
+        <div class="modal-recipe-footer">
+            ${recipe.sourceUrl ? `<a href="${recipe.sourceUrl}" target="_blank" class="source-link">View Original</a>` : ''}
+            <button onclick="deleteRecipe(${index})" class="delete-btn">Delete Recipe</button>
+        </div>
     `;
     
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
+    modal.style.display = 'flex';
 }
 
 function closeModal() {
-    modal.classList.add('hidden');
-    document.body.style.overflow = 'auto';
+    document.getElementById('recipeModal').style.display = 'none';
 }
 
-function toggleFavorite(index) {
-    recipes[index].favorite = !recipes[index].favorite;
-    saveRecipes();
-    updateStats();
-    applyFilters();
-}
-
-function saveRecipes() {
-    try {
-        localStorage.setItem('recipes', JSON.stringify(recipes));
-    } catch (error) {
-        console.error('Failed to save recipes:', error);
+function deleteRecipe(index) {
+    if (confirm('Are you sure you want to delete this recipe?')) {
+        const recipeToDelete = filteredRecipes[index];
+        const globalIndex = allRecipes.findIndex(r => r.id === recipeToDelete.id);
+        allRecipes.splice(globalIndex, 1);
+        filteredRecipes = allRecipes;
+        localStorage.setItem('recipes', JSON.stringify(allRecipes));
+        closeModal();
+        displayRecipes(allRecipes);
+        updateRecipeCount(allRecipes.length);
     }
 }
 
-function clearFilters() {
-    searchInput.value = '';
-    sourceFilter.value = 'all';
-    sortFilter.value = 'newest';
-    applyFilters();
-}
-
-// Close modal with Escape key
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+// Close modal on outside click
+window.onclick = function(event) {
+    const modal = document.getElementById('recipeModal');
+    if (event.target === modal) {
         closeModal();
     }
-});
-SimplyCodes
-
+}
