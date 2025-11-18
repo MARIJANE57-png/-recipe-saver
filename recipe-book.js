@@ -164,10 +164,7 @@ function openRecipeModal(index) {
     
     modalBody.innerHTML = `
         <div class="recipe-detail">
-            ${recipe.thumbnailUrl ? `
-                <img src="${recipe.thumbnailUrl}" alt="${recipe.title}" 
-                     style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 16px; margin-bottom: 32px;">
-            ` : ''}
+            
             
             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
                 <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 700; color: #0a0a0a; line-height: 1.2; letter-spacing: -1px;">${recipe.title || 'Untitled Recipe'}</h2>
