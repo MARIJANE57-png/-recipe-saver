@@ -1,3 +1,5 @@
+
+
 // Recipe Book JavaScript - ShopMy Style Horizontal Cards
 
 let allRecipes = [];
@@ -89,20 +91,20 @@ function setupSearch() {
 }
 
 function setupFilters() {
-    const filterBtn = document.getElementById('filterBtn');
-    const filterMenu = document.getElementById('filterMenu');
+    const sourceFilter = document.getElementById('sourceFilter');
+    const filterDropdown = document.getElementById('filterDropdown');
     
-    if (filterBtn && filterMenu) {
-        filterBtn.addEventListener('click', (e) => {
+    if (sourceFilter && filterDropdown) {
+        sourceFilter.addEventListener('click', (e) => {
             e.stopPropagation();
-            filterMenu.classList.toggle('show');
+            filterDropdown.classList.toggle('show');
         });
         
         document.addEventListener('click', () => {
-            filterMenu.classList.remove('show');
+            filterDropdown.classList.remove('show');
         });
         
-        filterMenu.addEventListener('click', (e) => {
+        filterDropdown.addEventListener('click', (e) => {
             e.stopPropagation();
         });
     }
@@ -116,14 +118,14 @@ function filterBySource(source) {
     }
     displayRecipes(filteredRecipes);
     updateRecipeCount(filteredRecipes.length);
-    document.getElementById('filterMenu').classList.remove('show');
+    document.getElementById('filterDropdown').classList.remove('show');
 }
 
 function filterByFavorites() {
     filteredRecipes = allRecipes.filter(recipe => recipe.favorite);
     displayRecipes(filteredRecipes);
     updateRecipeCount(filteredRecipes.length);
-    document.getElementById('filterMenu').classList.remove('show');
+    document.getElementById('filterDropdown').classList.remove('show');
 }
 
 function toggleFavorite(event, index) {
