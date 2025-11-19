@@ -1,0 +1,31 @@
+function openRecipeModal(index) {
+    const recipe = filteredRecipes[index];
+    const modal = document.getElementById('recipeModal');
+    const modalContent = document.getElementById('modalRecipeContent');
+    
+    modalContent.innerHTML = `
+        <div class="modal-recipe-header">
+            ${recipe.thumbnailUrl ? `
+                <img src="${recipe.thumbnailUrl}" alt="${recipe.title}" class="modal-recipe-image">
+            ` : ''}
+            <h2 class="modal-recipe-title">${recipe.title}</h2>
+            ${recipe.description ? `<p class="modal-recipe-description">${recipe.description}</p>` : ''}
+            
+            <div class="modal-recipe-meta">
+                ${recipe.prepTime ? `<span>⏱️ Prep: ${recipe.prepTime}</span>` : ''}
+                ${recipe.cookTime ? `<span>🔥 Cook: ${recipe.cookTime}</span>` : ''}
+                ${recipe.servings ? `<span>🍽️ Servings: ${recipe.servings}</span>` : ''}
+            </div>
+            
+            <span class="recipe-source-badge">${recipe.source || 'Recipe'}</span>
+        </div>
+        
+        <div class="modal-recipe-body">
+            <div class="modal-section">
+                <h3>Ingredients</h3>
+                <ul class="ingredients-list">
+                    ${recipe.ingredients?.map(ing => `<li>${ing}</li>`).join('') || '<li>No ingredients listed</li>'}
+                </ul>
+            </div>
+            
+            <div class="modal-section">
