@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadRecipes();
     setupSearch();
     setupFilters();
+    setupModalCloseHandlers();
 });
 
 function loadRecipes() {
@@ -62,9 +63,9 @@ function displayRecipes(recipes) {
 }
 
 function updateRecipeCount(count) {
-    const countEl = document.getElementById('recipeCount');
+    const countEl = document.getElementById('totalCount');
     if (countEl) {
-        countEl.textContent = `${count} recipe${count !== 1 ? 's' : ''} saved`;
+        countEl.textContent = count;
     }
 }
 
@@ -85,21 +86,55 @@ function setupSearch() {
 }
 
 function setupFilters() {
-    const sourceFilter = document.getElementById('sourceFilter');
+    const hamburgerMenu = document.getElementById('hamburgerMenu');
     const filterDropdown = document.getElementById('filterDropdown');
+    const sourceFilter = document.getElementById('sourceFilter');
+    const sortFilter = document.getElementById('sortFilter');
+    const clearFilters = document.getElementById('clearFilters');
     
-    if (sourceFilter && filterDropdown) {
-        sourceFilter.addEventListener('click', (e) => {
+    if (hamburgerMenu && filterDropdown) {
+        // Toggle dropdown when hamburger is clicked
+        hamburgerMenu.addEventListener('click', (e) => {
             e.stopPropagation();
-            filterDropdown.classList.toggle('show');
+            filterDropdown.classList.toggle('hidden');
         });
         
-        document.addEventListener('click', () => {
-            filterDropdown.classList.remove('show');
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!filterDropdown.contains(e.target) && e.target !== hamburgerMenu) {
+                filterDropdown.classList.add('hidden');
+            }
         });
         
+        // Prevent dropdown from closing when clicking inside it
         filterDropdown.addEventListener('click', (e) => {
             e.stopPropagation();
+        });
+    }
+    
+    // Source filter
+    if (sourceFilter) {
+        sourceFilter.addEventListener('change', (e) => {
+            filterBySource(e.target.value);
+        });
+    }
+    
+    // Sort filter
+    if (sortFilter) {
+        sortFilter.addEventListener('change', (e) => {
+            sortRecipes(e.target.value);
+        });
+    }
+    
+    // Clear filters button
+    if (clearFilters) {
+        clearFilters.addEventListener('click', () => {
+            sourceFilter.value = 'all';
+            sortFilter.value = 'newest';
+            filteredRecipes = allRecipes;
+            displayRecipes(filteredRecipes);
+            updateRecipeCount(filteredRecipes.length);
+            filterDropdown.classList.add('hidden');
         });
     }
 }
@@ -112,14 +147,38 @@ function filterBySource(source) {
     }
     displayRecipes(filteredRecipes);
     updateRecipeCount(filteredRecipes.length);
-    document.getElementById('filterDropdown').classList.remove('show');
+    const filterDropdown = document.getElementById('filterDropdown');
+    if (filterDropdown) {
+        filterDropdown.classList.add('hidden');
+    }
 }
 
 function filterByFavorites() {
     filteredRecipes = allRecipes.filter(recipe => recipe.favorite);
     displayRecipes(filteredRecipes);
     updateRecipeCount(filteredRecipes.length);
-    document.getElementById('filterDropdown').classList.remove('show');
+    const filterDropdown = document.getElementById('filterDropdown');
+    if (filterDropdown) {
+        filterDropdown.classList.add('hidden');
+    }
+}
+
+function sortRecipes(sortType) {
+    switch(sortType) {
+        case 'newest':
+            filteredRecipes.sort((a, b) => (b.id || 0) - (a.id || 0));
+            break;
+        case 'oldest':
+            filteredRecipes.sort((a, b) => (a.id || 0) - (b.id || 0));
+            break;
+        case 'name-asc':
+            filteredRecipes.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+            break;
+        case 'name-desc':
+            filteredRecipes.sort((a, b) => (b.title || '').localeCompare(a.title || ''));
+            break;
+    }
+    displayRecipes(filteredRecipes);
 }
 
 function toggleFavorite(event, index) {
@@ -180,11 +239,14 @@ function openRecipeModal(index) {
         </div>
     `;
     
-    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
 }
 
 function closeModal() {
-    document.getElementById('recipeModal').style.display = 'none';
+    const modal = document.getElementById('recipeModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
 }
 
 function deleteRecipe(index) {
@@ -200,10 +262,22 @@ function deleteRecipe(index) {
     }
 }
 
-// Close modal on outside click
-window.onclick = function(event) {
+// Setup modal close handlers
+function setupModalCloseHandlers() {
     const modal = document.getElementById('recipeModal');
-    if (event.target === modal) {
-        closeModal();
+    if (modal) {
+        // Click on backdrop
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal || e.target.classList.contains('modal-backdrop')) {
+                closeModal();
+            }
+        });
     }
+    
+    // Close button
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal-close')) {
+            closeModal();
+        }
+    });
 }
