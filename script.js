@@ -166,13 +166,33 @@ extractImageBtn?.addEventListener('click', async () => {
 document.getElementById('extractUrlBtn')?.addEventListener('click', async () => {
     const url = document.getElementById('websiteUrl').value.trim();
     const statusEl = document.getElementById('urlStatus');
+    const btn = document.getElementById('extractUrlBtn');
     
     if (!url) {
         showStatus(statusEl, 'Please enter a website URL', 'error');
         return;
     }
     
-    showStatus(statusEl, 'Website extraction coming soon! Use TikTok, Instagram, or Scan for now.', 'error');
+    // Basic URL validation
+    try {
+        new URL(url);
+    } catch (e) {
+        showStatus(statusEl, 'Please enter a valid URL (include https://)', 'error');
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.textContent = 'Extracting...';
+    
+    try {
+        await extractRecipe('website/extract', { 
+            websiteUrl: url, 
+            userId: getUserId() 
+        }, statusEl);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Extract Recipe';
+    }
 });
 
 // Manual Recipe Form
