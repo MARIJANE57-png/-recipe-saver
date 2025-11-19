@@ -1,6 +1,16 @@
-// FoodBook - Recipe Import JavaScript
+// Recipe Society - Import JavaScript
 
 const API_URL = 'https://recipe-api-pqbr.onrender.com';
+
+// Generate/get consistent user ID
+function getUserId() {
+    let userId = localStorage.getItem('userId');
+    if (!userId) {
+        userId = 'user_' + Date.now();
+        localStorage.setItem('userId', userId);
+    }
+    return userId;
+}
 
 // Tab Switching for Horizontal Pills
 const tabPills = document.querySelectorAll('.tab-pill');
@@ -26,26 +36,62 @@ tabPills.forEach(pill => {
 document.getElementById('extractTiktokBtn')?.addEventListener('click', async () => {
     const url = document.getElementById('tiktokUrl').value.trim();
     const statusEl = document.getElementById('tiktokStatus');
+    const btn = document.getElementById('extractTiktokBtn');
     
     if (!url) {
         showStatus(statusEl, 'Please enter a TikTok URL', 'error');
         return;
     }
     
-    await extractRecipe('tiktok/auto-extract', { tiktokUrl: url, userId: 'user123' }, statusEl);
+    // Validate URL format
+    if (!url.includes('tiktok.com')) {
+        showStatus(statusEl, 'Please enter a valid TikTok URL', 'error');
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.textContent = 'Extracting...';
+    
+    try {
+        await extractRecipe('tiktok/auto-extract', { 
+            tiktokUrl: url, 
+            userId: getUserId() 
+        }, statusEl);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Extract Recipe';
+    }
 });
 
 // Instagram Extraction
 document.getElementById('extractInstagramBtn')?.addEventListener('click', async () => {
     const url = document.getElementById('instagramUrl').value.trim();
     const statusEl = document.getElementById('instagramStatus');
+    const btn = document.getElementById('extractInstagramBtn');
     
     if (!url) {
         showStatus(statusEl, 'Please enter an Instagram URL', 'error');
         return;
     }
     
-    await extractRecipe('instagram/auto-extract', { instagramUrl: url, userId: 'user123' }, statusEl);
+    // Validate URL format
+    if (!url.includes('instagram.com')) {
+        showStatus(statusEl, 'Please enter a valid Instagram URL', 'error');
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.textContent = 'Extracting...';
+    
+    try {
+        await extractRecipe('instagram/auto-extract', { 
+            instagramUrl: url, 
+            userId: getUserId() 
+        }, statusEl);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Extract Recipe';
+    }
 });
 
 // Image Upload & Scan
@@ -102,7 +148,18 @@ extractImageBtn?.addEventListener('click', async () => {
         return;
     }
     
-    await extractRecipe('image/extract', { imageData, userId: 'user123' }, statusEl);
+    extractImageBtn.disabled = true;
+    extractImageBtn.textContent = 'Extracting...';
+    
+    try {
+        await extractRecipe('image/extract', { 
+            imageData, 
+            userId: getUserId() 
+        }, statusEl);
+    } finally {
+        extractImageBtn.disabled = false;
+        extractImageBtn.textContent = 'Extract Recipe from Image';
+    }
 });
 
 // Website URL Extraction
@@ -115,7 +172,7 @@ document.getElementById('extractUrlBtn')?.addEventListener('click', async () => 
         return;
     }
     
-    showStatus(statusEl, 'Website extraction coming soon! Use TikTok or Instagram for now.', 'error');
+    showStatus(statusEl, 'Website extraction coming soon! Use TikTok, Instagram, or Scan for now.', 'error');
 });
 
 // Manual Recipe Form
@@ -140,9 +197,10 @@ document.getElementById('manualForm')?.addEventListener('submit', async (e) => {
         source: 'Manual Entry',
         sourceUrl: '',
         thumbnailUrl: '',
-        userId: 'user123',
-        createdAt: new Date(),
-        id: Date.now().toString()
+        userId: getUserId(),
+        createdAt: new Date().toISOString(),
+        id: Date.now().toString(),
+        favorite: false
     };
     
     try {
@@ -158,13 +216,13 @@ document.getElementById('manualForm')?.addEventListener('submit', async (e) => {
             window.location.href = 'recipe-book.html';
         }, 1500);
     } catch (error) {
-        showStatus(statusEl, 'Failed to save recipe: ' + error.message, 'error');
+        showStatus(statusEl, '❌ Failed to save recipe: ' + error.message, 'error');
     }
 });
 
 // Helper Functions
 async function extractRecipe(endpoint, data, statusEl) {
-    showStatus(statusEl, '⏳ Extracting recipe...', 'loading');
+    showStatus(statusEl, '⏳ Extracting recipe... This may take 10-30 seconds.', 'loading');
     
     try {
         const response = await fetch(`${API_URL}/${endpoint}`, {
@@ -175,35 +233,50 @@ async function extractRecipe(endpoint, data, statusEl) {
             body: JSON.stringify(data)
         });
         
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+        
         const result = await response.json();
         
-        if (result.success) {
+        if (result.success && result.recipe) {
             const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
             recipes.push(result.recipe);
             localStorage.setItem('recipes', JSON.stringify(recipes));
             
-            showStatus(statusEl, '✅ Recipe extracted successfully!', 'success');
+            showStatus(statusEl, '✅ Recipe extracted successfully! Redirecting...', 'success');
             
             setTimeout(() => {
                 window.location.href = 'recipe-book.html';
             }, 1500);
         } else {
-            showStatus(statusEl, '❌ ' + (result.error || 'Failed to extract recipe'), 'error');
+            showStatus(statusEl, '❌ ' + (result.error || 'Failed to extract recipe. Please try again.'), 'error');
         }
     } catch (error) {
-        showStatus(statusEl, '❌ Error: ' + error.message, 'error');
+        console.error('Extraction error:', error);
+        
+        let errorMessage = '❌ ';
+        if (error.message.includes('Failed to fetch')) {
+            errorMessage += 'Cannot connect to server. The API might be sleeping (Render free tier). Please wait 30 seconds and try again.';
+        } else if (error.message.includes('Server error')) {
+            errorMessage += 'Server error. Please check if your API key is set in Render.';
+        } else {
+            errorMessage += 'Error: ' + error.message;
+        }
+        
+        showStatus(statusEl, errorMessage, 'error');
     }
 }
 
 function showStatus(element, message, type) {
+    if (!element) return;
+    
     element.textContent = message;
     element.className = 'status-message show ' + type;
     
     if (type === 'success' || type === 'error') {
         setTimeout(() => {
             element.classList.remove('show');
-        }, 5000);
+        }, 8000);
     }
 }
-SimplyCodes
-
