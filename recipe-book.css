@@ -563,10 +563,6 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
-SimplyCodes
-git add recipe-book.js
-git commit -m "Remove thumbnail images"
-git push origin main
 /* ShopMy-Style Horizontal Recipe Cards */
 
 #recipeGrid {
@@ -834,4 +830,23 @@ git push origin main
   border-radius: var(--radius-sm);
   cursor: pointer;
   font-weight: 600;
+}/* Recipe Society Badge */
+.recipe-card-badge {
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.creator-badge {
+  text-align: center;
+}
+
+.badge-text {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  line-height: 1.3;
+  letter-spacing: 0.5px;
 }
