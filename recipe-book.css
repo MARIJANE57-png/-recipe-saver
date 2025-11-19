@@ -714,3 +714,124 @@ git push origin main
     flex-wrap: wrap;
   }
 }
+/* Recipe Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: var(--color-cream);
+  border-radius: var(--radius-lg);
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 40px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 32px;
+  cursor: pointer;
+  color: var(--color-dark);
+}
+
+.modal-recipe-header {
+  margin-bottom: 32px;
+}
+
+.modal-recipe-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  margin-bottom: 24px;
+}
+
+.modal-recipe-title {
+  font-family: var(--font-serif);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin-bottom: 12px;
+}
+
+.modal-recipe-description {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.modal-recipe-meta {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #888;
+}
+
+.modal-recipe-body {
+  margin-bottom: 32px;
+}
+
+.modal-section {
+  margin-bottom: 32px;
+}
+
+.modal-section h3 {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin-bottom: 16px;
+}
+
+.ingredients-list,
+.instructions-list {
+  padding-left: 20px;
+}
+
+.ingredients-list li,
+.instructions-list li {
+  font-size: 15px;
+  color: var(--color-dark);
+  line-height: 1.8;
+  margin-bottom: 8px;
+}
+
+.modal-recipe-footer {
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.source-link {
+  color: var(--color-sage);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+}
