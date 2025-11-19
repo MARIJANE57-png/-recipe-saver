@@ -1,5 +1,3 @@
-
-
 // Recipe Book JavaScript - ShopMy Style Horizontal Cards
 
 let allRecipes = [];
@@ -35,15 +33,11 @@ function displayRecipes(recipes) {
     
     container.innerHTML = recipes.map(recipe => `
         <div class="recipe-card-horizontal" onclick="openRecipeModal(${recipes.indexOf(recipe)})">
-            ${recipe.thumbnailUrl ? `
-                <div class="recipe-card-image">
-                    <img src="${recipe.thumbnailUrl}" alt="${recipe.title}">
+            <div class="recipe-card-image recipe-card-badge">
+                <div class="creator-badge">
+                    <span class="badge-text">Recipe<br>Society</span>
                 </div>
-            ` : `
-                <div class="recipe-card-image recipe-card-no-image">
-                    <span style="font-size: 48px;">🍽️</span>
-                </div>
-            `}
+            </div>
             <div class="recipe-card-content">
                 <h3 class="recipe-card-title">${recipe.title || 'Untitled Recipe'}</h3>
                 
