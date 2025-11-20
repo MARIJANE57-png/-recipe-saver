@@ -118,9 +118,16 @@ async function scanRecipeImage(file) {
         const data = await response.json();
 
         if (data.success && data.recipe) {
+            // Remove large base64 image before saving to localStorage
+            const recipeToSave = { ...data.recipe };
+            if (recipeToSave.thumbnailUrl && recipeToSave.thumbnailUrl.startsWith('data:image')) {
+                // Don't store large base64 images in localStorage
+                recipeToSave.thumbnailUrl = '';
+            }
+            
             // Save to localStorage
             const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
-            recipes.push(data.recipe);
+            recipes.push(recipeToSave);
             localStorage.setItem('recipes', JSON.stringify(recipes));
 
             showMessage('Recipe scanned successfully! Redirecting...', 'success');
