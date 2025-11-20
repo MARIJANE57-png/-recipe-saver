@@ -1,7 +1,8 @@
-// Meal Plan JavaScript - Recipe Society
+// Meal Plan JavaScript - Recipe Society - SIMPLIFIED VERSION
+
+alert('Meal Plan JS loaded!'); // This will prove the file loaded
 
 const API_URL = 'https://recipe-api-pqbr.onrender.com';
-
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const MEALS = ['breakfast', 'lunch', 'dinner'];
 
@@ -10,12 +11,14 @@ let allRecipes = [];
 let currentAddingSlot = null;
 let dinnerOnlyMode = false;
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    alert('DOM loaded - starting initialization');
     loadMealPlan();
     loadRecipes();
     renderMealCards();
     setupEventListeners();
+    alert('Initialization complete!');
 });
 
 function loadMealPlan() {
@@ -23,7 +26,6 @@ function loadMealPlan() {
     if (saved) {
         mealPlan = JSON.parse(saved);
     } else {
-        // Initialize empty meal plan
         DAYS.forEach(day => {
             mealPlan[day] = {
                 breakfast: null,
@@ -47,6 +49,11 @@ function loadRecipes() {
 
 function renderMealCards() {
     const grid = document.getElementById('mealCardsGrid');
+    if (!grid) {
+        alert('ERROR: mealCardsGrid not found!');
+        return;
+    }
+    
     grid.innerHTML = '';
 
     DAYS.forEach(day => {
@@ -99,7 +106,10 @@ function createMealSlot(day, meal) {
         const removeBtn = document.createElement('button');
         removeBtn.className = 'meal-item-remove';
         removeBtn.textContent = '×';
-        removeBtn.onclick = () => removeMeal(day, meal);
+        removeBtn.onclick = function() {
+            alert('Removing meal: ' + day + ' ' + meal);
+            removeMeal(day, meal);
+        };
         mealItem.appendChild(removeBtn);
 
         content.appendChild(mealItem);
@@ -107,7 +117,10 @@ function createMealSlot(day, meal) {
         const addBtn = document.createElement('button');
         addBtn.className = 'add-meal-btn';
         addBtn.textContent = 'Add';
-        addBtn.onclick = () => openAddMealModal(day, meal);
+        addBtn.onclick = function() {
+            alert('Add button clicked! Day: ' + day + ', Meal: ' + meal);
+            openAddMealModal(day, meal);
+        };
         content.appendChild(addBtn);
     }
 
@@ -116,20 +129,33 @@ function createMealSlot(day, meal) {
 }
 
 function openAddMealModal(day, meal) {
-    currentAddingSlot = { day, meal };
+    alert('Opening modal for ' + day + ' ' + meal);
+    currentAddingSlot = { day: day, meal: meal };
+    
     const modal = document.getElementById('addMealModal');
+    if (!modal) {
+        alert('ERROR: Modal not found!');
+        return;
+    }
+    
     const title = document.getElementById('addMealTitle');
-    title.textContent = `Add ${meal.charAt(0).toUpperCase() + meal.slice(1)} for ${day}`;
+    if (title) {
+        title.textContent = 'Add ' + meal.charAt(0).toUpperCase() + meal.slice(1) + ' for ' + day;
+    }
     
     renderRecipePicker();
     modal.classList.remove('hidden');
 }
 
-function renderRecipePicker(searchTerm = '') {
+function renderRecipePicker(searchTerm) {
     const list = document.getElementById('recipePickerList');
+    if (!list) {
+        alert('ERROR: Recipe picker list not found!');
+        return;
+    }
     
     if (allRecipes.length === 0) {
-        list.innerHTML = '<div class="empty-meal-plan"><p>No recipes yet! Add some recipes first.</p></div>';
+        list.innerHTML = '<div class="empty-meal-plan"><h3>No recipes yet!</h3><p>Add some recipes to your Recipe Book first.</p></div>';
         return;
     }
 
@@ -143,15 +169,18 @@ function renderRecipePicker(searchTerm = '') {
     }
 
     list.innerHTML = '';
-    filtered.forEach(recipe => {
+    filtered.forEach(function(recipe) {
         const item = document.createElement('div');
         item.className = 'recipe-picker-item';
-        item.onclick = () => addMealToSlot(recipe);
+        item.onclick = function() {
+            alert('Recipe selected: ' + recipe.title);
+            addMealToSlot(recipe);
+        };
 
-        const title = document.createElement('div');
-        title.className = 'recipe-picker-item-title';
-        title.textContent = recipe.title || 'Untitled Recipe';
-        item.appendChild(title);
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'recipe-picker-item-title';
+        titleDiv.textContent = recipe.title || 'Untitled Recipe';
+        item.appendChild(titleDiv);
 
         const source = document.createElement('div');
         source.className = 'recipe-picker-item-source';
@@ -163,9 +192,14 @@ function renderRecipePicker(searchTerm = '') {
 }
 
 function addMealToSlot(recipe) {
-    if (!currentAddingSlot) return;
+    if (!currentAddingSlot) {
+        alert('ERROR: No slot selected!');
+        return;
+    }
 
-    const { day, meal } = currentAddingSlot;
+    const day = currentAddingSlot.day;
+    const meal = currentAddingSlot.meal;
+    
     mealPlan[day][meal] = {
         id: recipe.id,
         title: recipe.title
@@ -174,6 +208,7 @@ function addMealToSlot(recipe) {
     saveMealPlan();
     closeAddMealModal();
     renderMealCards();
+    alert('Meal added successfully!');
 }
 
 function removeMeal(day, meal) {
@@ -184,212 +219,32 @@ function removeMeal(day, meal) {
 
 function closeAddMealModal() {
     const modal = document.getElementById('addMealModal');
-    modal.classList.add('hidden');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
     currentAddingSlot = null;
 }
 
-// AI Suggestions
-async function getAISuggestions() {
-    const modal = document.getElementById('aiSuggestModal');
-    const list = document.getElementById('aiSuggestionsList');
-    const actions = document.getElementById('suggestionsActions');
-    
-    modal.classList.remove('hidden');
-    list.innerHTML = '<div class="loading-message">Analyzing your recipes and generating suggestions...</div>';
-    actions.style.display = 'none';
-
-    if (allRecipes.length === 0) {
-        list.innerHTML = '<div class="empty-meal-plan"><h3>No recipes yet!</h3><p>Add some recipes to your collection first, then I can suggest meal plans.</p></div>';
-        return;
-    }
-
-    try {
-        // Prepare recipe list for Claude
-        const recipeList = allRecipes.map(r => r.title).join(', ');
-        
-        const prompt = `I have these recipes: ${recipeList}
-
-Create a balanced weekly meal plan using ONLY these recipes. For each day, suggest:
-- Breakfast
-- Lunch  
-- Dinner
-
-Consider:
-- Variety (don't repeat recipes)
-- Balance (mix of proteins, veggies, carbs)
-- Use as many different recipes as possible
-
-Return ONLY valid JSON (no markdown):
-{
-  "Monday": {"breakfast": "Recipe Name", "lunch": "Recipe Name", "dinner": "Recipe Name"},
-  "Tuesday": {"breakfast": "Recipe Name", "lunch": "Recipe Name", "dinner": "Recipe Name"},
-  ...for all 7 days
-}`;
-
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: 'claude-sonnet-4-20250514',
-                max_tokens: 2000,
-                messages: [{
-                    role: 'user',
-                    content: prompt
-                }]
-            })
-        });
-
-        if (!response.ok) throw new Error('Failed to get suggestions');
-
-        const data = await response.json();
-        let suggestionsText = data.content[0].text.trim();
-        suggestionsText = suggestionsText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        
-        const suggestions = JSON.parse(suggestionsText);
-        
-        renderAISuggestions(suggestions);
-        actions.style.display = 'block';
-        
-    } catch (error) {
-        console.error('AI Suggestions error:', error);
-        list.innerHTML = '<div class="empty-meal-plan"><h3>Oops!</h3><p>Could not generate suggestions. Make sure your backend is running and try again.</p></div>';
-    }
-}
-
-function renderAISuggestions(suggestions) {
-    const list = document.getElementById('aiSuggestionsList');
-    list.innerHTML = '';
-
-    DAYS.forEach(day => {
-        if (!suggestions[day]) return;
-
-        const dayDiv = document.createElement('div');
-        dayDiv.className = 'ai-suggestion-day';
-
-        const dayTitle = document.createElement('div');
-        dayTitle.className = 'ai-suggestion-day-title';
-        dayTitle.textContent = day;
-        dayDiv.appendChild(dayTitle);
-
-        const mealsDiv = document.createElement('div');
-        mealsDiv.className = 'ai-suggestion-meals';
-
-        MEALS.forEach(meal => {
-            if (!suggestions[day][meal]) return;
-
-            const mealDiv = document.createElement('div');
-            mealDiv.className = 'ai-suggestion-meal';
-
-            const label = document.createElement('span');
-            label.className = 'ai-suggestion-meal-label';
-            label.textContent = meal.charAt(0).toUpperCase() + meal.slice(1) + ':';
-            mealDiv.appendChild(label);
-
-            const name = document.createElement('span');
-            name.className = 'ai-suggestion-meal-name';
-            name.textContent = suggestions[day][meal];
-            mealDiv.appendChild(name);
-
-            mealsDiv.appendChild(mealDiv);
-        });
-
-        dayDiv.appendChild(mealsDiv);
-        list.appendChild(dayDiv);
-    });
-
-    // Store suggestions for applying
-    list.dataset.suggestions = JSON.stringify(suggestions);
-}
-
-function applySuggestions() {
-    const list = document.getElementById('aiSuggestionsList');
-    const suggestions = JSON.parse(list.dataset.suggestions || '{}');
-
-    DAYS.forEach(day => {
-        if (!suggestions[day]) return;
-
-        MEALS.forEach(meal => {
-            const suggestedMeal = suggestions[day][meal];
-            if (!suggestedMeal) return;
-
-            // Find matching recipe
-            const recipe = allRecipes.find(r => 
-                r.title?.toLowerCase() === suggestedMeal.toLowerCase()
-            );
-
-            if (recipe) {
-                mealPlan[day][meal] = {
-                    id: recipe.id,
-                    title: recipe.title
-                };
-            }
-        });
-    });
-
-    saveMealPlan();
-    closeAISuggestModal();
-    renderMealCards();
-}
-
-function closeAISuggestModal() {
-    const modal = document.getElementById('aiSuggestModal');
-    modal.classList.add('hidden');
-}
-
-function toggleDinnerOnly() {
-    dinnerOnlyMode = !dinnerOnlyMode;
-    const btn = document.getElementById('dinnerOnlyToggle');
-    
-    if (dinnerOnlyMode) {
-        document.body.classList.add('dinner-only-mode');
-        btn.classList.add('active');
-    } else {
-        document.body.classList.remove('dinner-only-mode');
-        btn.classList.remove('active');
-    }
-}
-
-function clearWeek() {
-    if (!confirm('Clear entire week? This cannot be undone.')) return;
-
-    DAYS.forEach(day => {
-        MEALS.forEach(meal => {
-            mealPlan[day][meal] = null;
-        });
-    });
-
-    saveMealPlan();
-    renderMealCards();
-}
-
-// Event Listeners
 function setupEventListeners() {
-    // AI Suggestions
-    document.getElementById('aiSuggestBtn').addEventListener('click', getAISuggestions);
-    document.getElementById('applySuggestionsBtn').addEventListener('click', applySuggestions);
-    document.getElementById('closeAiSuggest').addEventListener('click', closeAISuggestModal);
-
-    // Dinner Only Toggle
-    document.getElementById('dinnerOnlyToggle').addEventListener('click', toggleDinnerOnly);
-
-    // Clear Week
-    document.getElementById('clearWeekBtn').addEventListener('click', clearWeek);
-
     // Close Add Meal Modal
-    document.getElementById('closeAddMeal').addEventListener('click', closeAddMealModal);
+    const closeBtn = document.getElementById('closeAddMeal');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeAddMealModal);
+    }
 
     // Recipe Search
-    document.getElementById('recipePickerSearch').addEventListener('input', (e) => {
-        renderRecipePicker(e.target.value);
-    });
+    const searchInput = document.getElementById('recipePickerSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            renderRecipePicker(e.target.value);
+        });
+    }
 
     // Close modals on backdrop click
-    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-        backdrop.addEventListener('click', () => {
-            closeAddMealModal();
-            closeAISuggestModal();
-        });
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(function(backdrop) {
+        backdrop.addEventListener('click', closeAddMealModal);
     });
+    
+    alert('Event listeners setup complete!');
 }
