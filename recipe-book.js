@@ -12,11 +12,51 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function loadRecipes() {
-    const recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
-    allRecipes = recipes;
-    filteredRecipes = recipes;
-    displayRecipes(recipes);
-    updateRecipeCount(recipes.length);
+    try {
+        const recipesData = localStorage.getItem('recipes');
+        
+        // Check if data is too large
+        if (recipesData && recipesData.length > 5000000) { // 5MB
+            console.warn('Recipe data is too large, clearing...');
+            localStorage.removeItem('recipes');
+            alert('Your recipe data was too large and has been cleared. Please re-import your recipes without large images.');
+            allRecipes = [];
+            filteredRecipes = [];
+            displayRecipes([]);
+            updateRecipeCount(0);
+            return;
+        }
+        
+        const recipes = JSON.parse(recipesData || '[]');
+        
+        // Remove base64 images that are too large to prevent crashes
+        const cleanedRecipes = recipes.map(recipe => {
+            if (recipe.thumbnailUrl && recipe.thumbnailUrl.startsWith('data:image') && recipe.thumbnailUrl.length > 100000) {
+                // Image is too large, remove it
+                return { ...recipe, thumbnailUrl: '' };
+            }
+            return recipe;
+        });
+        
+        allRecipes = cleanedRecipes;
+        filteredRecipes = cleanedRecipes;
+        displayRecipes(cleanedRecipes);
+        updateRecipeCount(cleanedRecipes.length);
+        
+        // Save cleaned recipes back
+        if (JSON.stringify(cleanedRecipes) !== recipesData) {
+            localStorage.setItem('recipes', JSON.stringify(cleanedRecipes));
+        }
+    } catch (error) {
+        console.error('Error loading recipes:', error);
+        // If there's an error, clear and start fresh
+        localStorage.removeItem('recipes');
+        allRecipes = [];
+        filteredRecipes = [];
+        displayRecipes([]);
+        updateRecipeCount(0);
+        alert('There was an error loading your recipes. The data has been cleared.');
+    }
 }
 
 function displayRecipes(recipes) {
