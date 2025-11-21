@@ -1,6 +1,6 @@
 // Meal Plan JavaScript - Recipe Society - SIMPLIFIED VERSION
 
-alert('Meal Plan JS loaded!'); // This will prove the file loaded
+
 
 const API_URL = 'https://recipe-api-pqbr.onrender.com';
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -13,12 +13,12 @@ let dinnerOnlyMode = false;
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    alert('DOM loaded - starting initialization');
+    
     loadMealPlan();
     loadRecipes();
     renderMealCards();
     setupEventListeners();
-    alert('Initialization complete!');
+   
 });
 
 function loadMealPlan() {
@@ -50,7 +50,7 @@ function loadRecipes() {
 function renderMealCards() {
     const grid = document.getElementById('mealCardsGrid');
     if (!grid) {
-        alert('ERROR: mealCardsGrid not found!');
+       
         return;
     }
     
@@ -107,7 +107,7 @@ function createMealSlot(day, meal) {
         removeBtn.className = 'meal-item-remove';
         removeBtn.textContent = '×';
         removeBtn.onclick = function() {
-            alert('Removing meal: ' + day + ' ' + meal);
+           
             removeMeal(day, meal);
         };
         mealItem.appendChild(removeBtn);
@@ -118,7 +118,7 @@ function createMealSlot(day, meal) {
         addBtn.className = 'add-meal-btn';
         addBtn.textContent = 'Add';
         addBtn.onclick = function() {
-            alert('Add button clicked! Day: ' + day + ', Meal: ' + meal);
+            
             openAddMealModal(day, meal);
         };
         content.appendChild(addBtn);
@@ -129,12 +129,12 @@ function createMealSlot(day, meal) {
 }
 
 function openAddMealModal(day, meal) {
-    alert('Opening modal for ' + day + ' ' + meal);
+    
     currentAddingSlot = { day: day, meal: meal };
     
     const modal = document.getElementById('addMealModal');
     if (!modal) {
-        alert('ERROR: Modal not found!');
+        
         return;
     }
     
@@ -150,7 +150,7 @@ function openAddMealModal(day, meal) {
 function renderRecipePicker(searchTerm) {
     const list = document.getElementById('recipePickerList');
     if (!list) {
-        alert('ERROR: Recipe picker list not found!');
+       
         return;
     }
     
@@ -173,7 +173,7 @@ function renderRecipePicker(searchTerm) {
         const item = document.createElement('div');
         item.className = 'recipe-picker-item';
         item.onclick = function() {
-            alert('Recipe selected: ' + recipe.title);
+           
             addMealToSlot(recipe);
         };
 
@@ -193,7 +193,7 @@ function renderRecipePicker(searchTerm) {
 
 function addMealToSlot(recipe) {
     if (!currentAddingSlot) {
-        alert('ERROR: No slot selected!');
+        
         return;
     }
 
@@ -208,8 +208,7 @@ function addMealToSlot(recipe) {
     saveMealPlan();
     closeAddMealModal();
     renderMealCards();
-    alert('Meal added successfully!');
-}
+   
 
 function removeMeal(day, meal) {
     mealPlan[day][meal] = null;
@@ -246,5 +245,4 @@ function setupEventListeners() {
         backdrop.addEventListener('click', closeAddMealModal);
     });
     
-    alert('Event listeners setup complete!');
-}
+    
