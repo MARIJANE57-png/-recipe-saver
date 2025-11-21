@@ -15,11 +15,20 @@ function loadRecipes() {
     try {
         const recipesData = localStorage.getItem('recipes');
         
-        // Check if data is too large
-        if (recipesData && recipesData.length > 5000000) { // 5MB
-            console.warn('Recipe data is too large, clearing...');
+        // Safety check - if data seems corrupted or too large, start fresh
+        if (!recipesData) {
+            allRecipes = [];
+            filteredRecipes = [];
+            displayRecipes([]);
+            updateRecipeCount(0);
+            return;
+        }
+        
+        // Check data size (if over 4MB, probably has images - clear it)
+        if (recipesData.length > 4000000) {
+            console.warn('Recipe data too large - clearing for safety');
             localStorage.removeItem('recipes');
-            alert('Your recipe data was too large and has been cleared. Please re-import your recipes without large images.');
+            alert('Recipe data was too large. Starting fresh! Please re-add your recipes without images.');
             allRecipes = [];
             filteredRecipes = [];
             displayRecipes([]);
