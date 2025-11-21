@@ -1,208 +1,54 @@
+Recipe Society
+TikTok Instagram Scan Website Manual
+Import from TikTok
+Paste a TikTok video URL to extract the recipe
+Extract Recipe
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recipe Society - Import Recipe</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="app-wrapper">
-        <!-- Header with recipe Society branding -->
-        <header class="page-header">
-            <h1 class="page-title">Recipe Society</h1>
-        </header>
+How to get the URL:
+	1	Open TikTok and find a recipe video
+	2	Tap the Share button
+	3	Tap "Copy Link"
+	4	Paste it here!
+Import from Instagram
+Paste an Instagram Reel URL to extract the recipe
+Extract Recipe
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Horizontal Rounded Tabs - ShopMy Style -->
-            <div class="horizontal-tabs">
-                <button class="tab-pill active" data-platform="tiktok">TikTok</button>
-                <button class="tab-pill" data-platform="instagram">Instagram</button>
-                <button class="tab-pill" data-platform="scan">Scan</button>
-                <button class="tab-pill" data-platform="url">Website</button>
-                <button class="tab-pill" data-platform="manual">Manual</button>
-            </div>
+How to get the URL:
+	1	Open Instagram and find a recipe Reel
+	2	Tap the three dots (...)
+	3	Tap "Copy Link"
+	4	Paste it here!
+Scan a Recipe
+Upload a photo of a recipe from a book, magazine, or screenshot
+📷
+Click to upload or drag & drop
+PNG, JPG up to 10MB
 
-            <!-- Tab Contents -->
-            <div class="tab-content active" id="tiktok-tab">
-                <div class="import-card">
-                    <h3 class="import-title">Import from TikTok</h3>
-                    <p class="import-description">Paste a TikTok video URL to extract the recipe</p>
-                    <div class="url-input-group">
-                        <input type="text" id="tiktokUrl" placeholder="https://www.tiktok.com/@username/video/..." class="url-input">
-                        <button id="extractTiktokBtn" class="extract-btn">Extract Recipe</button>
-                    </div>
-                    <div id="tiktokStatus" class="status-message"></div>
-                </div>
-                <div class="help-section">
-                    <h4>How to get the URL:</h4>
-                    <ol class="help-steps">
-                        <li>Open TikTok and find a recipe video</li>
-                        <li>Tap the Share button</li>
-                        <li>Tap "Copy Link"</li>
-                        <li>Paste it here!</li>
-                    </ol>
-                </div>
-            </div>
+What you can scan:
+	1	Recipe cards
+	2	Cookbook pages
+	3	Screenshots from social media
+	4	Printed recipes
+Import from Website
+Paste any recipe URL from websites like AllRecipes, Food Network, etc.
+Extract Recipe
 
-            <div class="tab-content" id="instagram-tab">
-                <div class="import-card">
-                    <h3 class="import-title">Import from Instagram</h3>
-                    <p class="import-description">Paste an Instagram Reel URL to extract the recipe</p>
-                    <div class="url-input-group">
-                        <input type="text" id="instagramUrl" placeholder="https://www.instagram.com/reel/..." class="url-input">
-                        <button id="extractInstagramBtn" class="extract-btn">Extract Recipe</button>
-                    </div>
-                    <div id="instagramStatus" class="status-message"></div>
-                </div>
-                <div class="help-section">
-                    <h4>How to get the URL:</h4>
-                    <ol class="help-steps">
-                        <li>Open Instagram and find a recipe Reel</li>
-                        <li>Tap the three dots (...)</li>
-                        <li>Tap "Copy Link"</li>
-                        <li>Paste it here!</li>
-                    </ol>
-                </div>
-            </div>
+Supported websites:
+	1	AllRecipes, Food Network, Bon Appétit
+	2	NYT Cooking, Serious Eats
+	3	Most recipe blogs
+	4	Any site with a recipe!
+Create Recipe Manually
+Type your own recipe or copy & paste from anywhere
+Recipe Title *
+Description
+Prep Time
+Cook Time
+Servings
+Ingredients *
+One ingredient per line
+Instructions *
+One step per line
+Save Recipe
 
-            <div class="tab-content" id="scan-tab">
-                <div class="import-card">
-                    <h3 class="import-title">Scan a Recipe</h3>
-                    <p class="import-description">Upload a photo of a recipe from a book, magazine, or screenshot</p>
-                    <div class="upload-area" id="uploadArea">
-                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
-                        <div class="upload-placeholder">
-                            <div class="upload-icon">📷</div>
-                            <p class="upload-text">Click to upload or drag & drop</p>
-                            <p class="upload-subtext">PNG, JPG up to 10MB</p>
-                        </div>
-                        <img id="imagePreview" class="image-preview" style="display: none;">
-                    </div>
-                    <button id="extractImageBtn" class="extract-btn" style="width: 100%; margin-top: 16px; display: none;">Extract Recipe from Image</button>
-                    <div id="scanStatus" class="status-message"></div>
-                </div>
-                <div class="help-section">
-                    <h4>What you can scan:</h4>
-                    <ol class="help-steps">
-                        <li>Recipe cards</li>
-                        <li>Cookbook pages</li>
-                        <li>Screenshots from social media</li>
-                        <li>Printed recipes</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div class="tab-content" id="url-tab">
-                <div class="import-card">
-                    <h3 class="import-title">Import from Website</h3>
-                    <p class="import-description">Paste any recipe URL from websites like AllRecipes, Food Network, etc.</p>
-                    <div class="url-input-group">
-                        <input type="text" id="websiteUrl" placeholder="https://www.allrecipes.com/recipe/..." class="url-input">
-                        <button id="extractUrlBtn" class="extract-btn">Extract Recipe</button>
-                    </div>
-                    <div id="urlStatus" class="status-message"></div>
-                </div>
-                <div class="help-section">
-                    <h4>Supported websites:</h4>
-                    <ol class="help-steps">
-                        <li>AllRecipes, Food Network, Bon Appétit</li>
-                        <li>NYT Cooking, Serious Eats</li>
-                        <li>Most recipe blogs</li>
-                        <li>Any site with a recipe!</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div class="tab-content" id="manual-tab">
-                <div class="import-card">
-                    <h3 class="import-title">Create Recipe Manually</h3>
-                    <p class="import-description">Type your own recipe or copy & paste from anywhere</p>
-                    <form id="manualForm" class="manual-form">
-                        <div class="form-group">
-                            <label class="form-label">Recipe Title *</label>
-                            <input type="text" id="manualTitle" class="form-input" placeholder="e.g. Grandma's Chocolate Chip Cookies" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Description</label>
-                            <textarea id="manualDescription" class="form-textarea" rows="3" placeholder="Brief description of the recipe..."></textarea>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Prep Time</label>
-                                <input type="text" id="manualPrepTime" class="form-input" placeholder="e.g. 15 min">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Cook Time</label>
-                                <input type="text" id="manualCookTime" class="form-input" placeholder="e.g. 30 min">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Servings</label>
-                                <input type="text" id="manualServings" class="form-input" placeholder="e.g. 4">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Ingredients *</label>
-                            <textarea id="manualIngredients" class="form-textarea" rows="8" placeholder="Enter each ingredient on a new line:&#10;2 cups flour&#10;1 cup sugar&#10;3 eggs" required></textarea>
-                            <p class="form-hint">One ingredient per line</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Instructions *</label>
-                            <textarea id="manualInstructions" class="form-textarea" rows="10" placeholder="Enter each step on a new line:&#10;Preheat oven to 350°F&#10;Mix flour and sugar&#10;Add eggs and stir" required></textarea>
-                            <p class="form-hint">One step per line</p>
-                        </div>
-                        <button type="submit" class="extract-btn" style="width: 100%;">Save Recipe</button>
-                    </form>
-                    <div id="manualStatus" class="status-message"></div>
-                </div>
-            </div>
-        </main>
-
-        <!-- Bottom Navigation - ShopMy Style -->
-        <nav class="bottom-nav">
-            <a href="index.html" class="nav-item active">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                <span>Import</span>
-            </a>
-            <a href="recipe-book.html" class="nav-item">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                </svg>
-                <span>Recipe Book</span>
-            </a>
-            <a href="#" class="nav-item disabled">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-                <span>Meal Plan</span>
-            </a>
-            <a href="meal-plan.html" class="nav-item">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M9 11l3 3L22 4"></path>
-                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-                </svg>
-                <span>Meal Plant</span>
-            </a>
-            <a href="#" class="nav-item disabled">
-                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg>
-                <span>Settings</span>
-            </a>
-        </nav>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
+Import Recipe Book Meal Plan Shopping List Settings
