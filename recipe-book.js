@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupFilters();
     setupModalCloseHandlers();
 });
-
 function loadRecipes() {
     try {
         const recipesData = localStorage.getItem('recipes');
@@ -28,7 +27,7 @@ function loadRecipes() {
         if (recipesData.length > 4000000) {
             console.warn('Recipe data too large - clearing for safety');
             localStorage.removeItem('recipes');
-            alert('Recipe data was too large. Starting fresh! Please re-add your recipes without images.');
+            alert('Recipe data was too large. Starting fresh! Please re-add your recipes.');
             allRecipes = [];
             filteredRecipes = [];
             displayRecipes([]);
@@ -36,15 +35,12 @@ function loadRecipes() {
             return;
         }
         
-        const recipes = JSON.parse(recipesData || '[]');
+        const recipes = JSON.parse(recipesData);
         
-        // Remove base64 images that are too large to prevent crashes
+        // Remove any thumbnailUrl fields that might exist
         const cleanedRecipes = recipes.map(recipe => {
-            if (recipe.thumbnailUrl && recipe.thumbnailUrl.startsWith('data:image') && recipe.thumbnailUrl.length > 100000) {
-                // Image is too large, remove it
-                return { ...recipe, thumbnailUrl: '' };
-            }
-            return recipe;
+            const { thumbnailUrl, ...recipeWithoutImage } = recipe;
+            return recipeWithoutImage;
         });
         
         allRecipes = cleanedRecipes;
@@ -52,19 +48,17 @@ function loadRecipes() {
         displayRecipes(cleanedRecipes);
         updateRecipeCount(cleanedRecipes.length);
         
-        // Save cleaned recipes back
-        if (JSON.stringify(cleanedRecipes) !== recipesData) {
-            localStorage.setItem('recipes', JSON.stringify(cleanedRecipes));
-        }
+        // Save cleaned version back
+        localStorage.setItem('recipes', JSON.stringify(cleanedRecipes));
+        
     } catch (error) {
         console.error('Error loading recipes:', error);
-        // If there's an error, clear and start fresh
+        // If there's ANY error, clear and start fresh
         localStorage.removeItem('recipes');
         allRecipes = [];
         filteredRecipes = [];
         displayRecipes([]);
         updateRecipeCount(0);
-        alert('There was an error loading your recipes. The data has been cleared.');
     }
 }
 
