@@ -1,6 +1,4 @@
-// Meal Plan JavaScript - Recipe Society - SIMPLIFIED VERSION
-
-
+// Meal Plan JavaScript - Recipe Society - CLEAN VERSION (NO ALERTS)
 
 const API_URL = 'https://recipe-api-pqbr.onrender.com';
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -11,14 +9,12 @@ let allRecipes = [];
 let currentAddingSlot = null;
 let dinnerOnlyMode = false;
 
-// Initialize when page loads
+// Initialize
 document.addEventListener('DOMContentLoaded', function() {
-    
     loadMealPlan();
     loadRecipes();
     renderMealCards();
     setupEventListeners();
-   
 });
 
 function loadMealPlan() {
@@ -49,10 +45,7 @@ function loadRecipes() {
 
 function renderMealCards() {
     const grid = document.getElementById('mealCardsGrid');
-    if (!grid) {
-       
-        return;
-    }
+    if (!grid) return;
     
     grid.innerHTML = '';
 
@@ -107,7 +100,6 @@ function createMealSlot(day, meal) {
         removeBtn.className = 'meal-item-remove';
         removeBtn.textContent = '×';
         removeBtn.onclick = function() {
-           
             removeMeal(day, meal);
         };
         mealItem.appendChild(removeBtn);
@@ -118,7 +110,6 @@ function createMealSlot(day, meal) {
         addBtn.className = 'add-meal-btn';
         addBtn.textContent = 'Add';
         addBtn.onclick = function() {
-            
             openAddMealModal(day, meal);
         };
         content.appendChild(addBtn);
@@ -129,14 +120,10 @@ function createMealSlot(day, meal) {
 }
 
 function openAddMealModal(day, meal) {
-    
     currentAddingSlot = { day: day, meal: meal };
     
     const modal = document.getElementById('addMealModal');
-    if (!modal) {
-        
-        return;
-    }
+    if (!modal) return;
     
     const title = document.getElementById('addMealTitle');
     if (title) {
@@ -149,10 +136,7 @@ function openAddMealModal(day, meal) {
 
 function renderRecipePicker(searchTerm) {
     const list = document.getElementById('recipePickerList');
-    if (!list) {
-       
-        return;
-    }
+    if (!list) return;
     
     if (allRecipes.length === 0) {
         list.innerHTML = '<div class="empty-meal-plan"><h3>No recipes yet!</h3><p>Add some recipes to your Recipe Book first.</p></div>';
@@ -173,7 +157,6 @@ function renderRecipePicker(searchTerm) {
         const item = document.createElement('div');
         item.className = 'recipe-picker-item';
         item.onclick = function() {
-           
             addMealToSlot(recipe);
         };
 
@@ -192,10 +175,7 @@ function renderRecipePicker(searchTerm) {
 }
 
 function addMealToSlot(recipe) {
-    if (!currentAddingSlot) {
-        
-        return;
-    }
+    if (!currentAddingSlot) return;
 
     const day = currentAddingSlot.day;
     const meal = currentAddingSlot.meal;
@@ -208,7 +188,7 @@ function addMealToSlot(recipe) {
     saveMealPlan();
     closeAddMealModal();
     renderMealCards();
-   
+}
 
 function removeMeal(day, meal) {
     mealPlan[day][meal] = null;
@@ -224,7 +204,45 @@ function closeAddMealModal() {
     currentAddingSlot = null;
 }
 
+function toggleDinnerOnly() {
+    dinnerOnlyMode = !dinnerOnlyMode;
+    const btn = document.getElementById('dinnerOnlyToggle');
+    
+    if (dinnerOnlyMode) {
+        document.body.classList.add('dinner-only-mode');
+        btn.classList.add('active');
+    } else {
+        document.body.classList.remove('dinner-only-mode');
+        btn.classList.remove('active');
+    }
+}
+
+function clearWeek() {
+    if (!confirm('Clear entire week? This cannot be undone.')) return;
+
+    DAYS.forEach(day => {
+        MEALS.forEach(meal => {
+            mealPlan[day][meal] = null;
+        });
+    });
+
+    saveMealPlan();
+    renderMealCards();
+}
+
 function setupEventListeners() {
+    // Dinner Only Toggle
+    const dinnerBtn = document.getElementById('dinnerOnlyToggle');
+    if (dinnerBtn) {
+        dinnerBtn.addEventListener('click', toggleDinnerOnly);
+    }
+
+    // Clear Week
+    const clearBtn = document.getElementById('clearWeekBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearWeek);
+    }
+
     // Close Add Meal Modal
     const closeBtn = document.getElementById('closeAddMeal');
     if (closeBtn) {
@@ -244,5 +262,4 @@ function setupEventListeners() {
     backdrops.forEach(function(backdrop) {
         backdrop.addEventListener('click', closeAddMealModal);
     });
-    
-    
+}
